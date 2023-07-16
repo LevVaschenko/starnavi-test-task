@@ -1,9 +1,7 @@
 .container {
     display: flex !important;
-    justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     height: 90vh;
-    flex-direction: column;
 }
 
 .square {
@@ -12,12 +10,8 @@
     border: 1.5px solid black;
 }
 
-.game-field {
-    margin-top: 100px;
-    margin-bottom: 100px;
-}
-
 .field {
+    margin-top: 30px;
     display: flex;
 }
 
@@ -32,6 +26,32 @@
 .difficulties-box {
     display: flex;
     justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.hover-squares {
+    margin-left: 65px;
+}
+
+.hover-squares-details {
+    display: flex;
     align-items: center;
     flex-direction: column;
+}
+
+.hover-square {
+    width: 175px;
+    display: flex;
+    color: rgba(123, 96, 52);
+    background-color: rgba(251, 247, 220);
+    padding: 8px;
+    font-weight: bold;
+}
+
+.select {
+    margin-top: 50px;
+    margin-bottom: 50px;
+    width: 140px;
+    height: 30px;
 }
