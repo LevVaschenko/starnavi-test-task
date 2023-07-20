@@ -21,25 +21,33 @@ const Main = (props: Props) => {
     const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty | null>(null)
     const [blueSquares, setBlueSquares] = useState<number[]>([])
     const [startClicked, setStartClicked] = useState(false)
+    const [leftField, setLeftField] = useState(false)
+
 
     const handleSquareHover = (squareIndex: number) => {
         if (startClicked && !hoveredSquares.includes(squareIndex)) {
             setHoveredSquares([...hoveredSquares, squareIndex])
             setBlueSquares([...blueSquares, squareIndex])
+            console.log('Square hovered:', squareIndex)
         }
     }
 
     const handleSquareLeave = (squareIndex: number) => {
-        if (startClicked && hoveredSquares.includes(squareIndex)) {
-            setHoveredSquares(hoveredSquares.filter((index) => index !== squareIndex))
-            setBlueSquares(blueSquares.filter((index) => index !== squareIndex))
+        if (startClicked) {
+            if (hoveredSquares.includes(squareIndex)) {
+                if (!leftField) {
+                    setHoveredSquares(prevHoveredSquares => prevHoveredSquares.filter(index => index !== squareIndex))
+                    setBlueSquares(prevBlueSquares => prevBlueSquares.filter(index => index !== squareIndex))
+                }
+                setLeftField(false)
+                console.log('Square left:', squareIndex)
+            }
         }
     }
 
     const handleFieldLeave = () => {
         if (startClicked) {
-            const filledSquares = blueSquares.filter(squareIndex => hoveredSquares.includes(squareIndex))
-            setHoveredSquares([...hoveredSquares, ...filledSquares])
+            setLeftField(true)
         }
     }
 
@@ -50,11 +58,13 @@ const Main = (props: Props) => {
             setHoveredSquares([])
             setBlueSquares([])
             setStartClicked(false)
+            console.log('Difficulty changed:', selectedMode)
         }
     }
 
     const handleStartClick = () => {
         setStartClicked(true)
+        console.log('Start button clicked')
     }
 
     useEffect(() => {
@@ -63,7 +73,9 @@ const Main = (props: Props) => {
                 const response = await fetch('https://60816d9073292b0017cdd833.mockapi.io/modes')
                 const data = await response.json()
                 setModes(data)
-                setSelectedDifficulty(data[0])
+                if (data.length > 0) {
+                    setSelectedDifficulty(data[0])
+                }
             } catch (error) {
                 console.error('Error fetching data:', error)
             }
@@ -93,7 +105,7 @@ const Main = (props: Props) => {
                             ))}
                         </select>
                         {!startClicked && (
-                            <div className="start-container" style={{ marginTop: '50px', marginBottom: '50px', marginLeft: '15px'}}>
+                            <div className="start-container" style={{ marginTop: '50px', marginBottom: '50px', marginLeft: '15px' }}>
                                 <button className='start-button' style={{ width: '80px', height: '30px', color: 'white', backgroundColor: 'rgb(12, 93, 207)', border: 'none', borderRadius: '3px', cursor: 'pointer' }} onClick={handleStartClick}>
                                     START
                                 </button>
@@ -119,7 +131,7 @@ const Main = (props: Props) => {
                                                         className={squareClass}
                                                         onMouseEnter={() => handleSquareHover(squareIndex)}
                                                         onMouseLeave={() => handleSquareLeave(squareIndex)}
-                                                        style={{ width: '50px', height: '50px', border: '1.5px solid black', cursor: 'pointer', order: isHovered ? 1 : 0, backgroundColor: isHovered ? 'rgb(12, 93, 207)' : 'transparent' }}
+                                                        style={{ width: '50px', height: '50px', border: '1.5px solid black', cursor: 'pointer', backgroundColor: isHovered ? 'rgb(12, 93, 207)' : 'transparent' }}
                                                     ></div>
                                                 )
                                             })}
@@ -131,13 +143,13 @@ const Main = (props: Props) => {
                 {startClicked && selectedDifficulty && (
                     <div className="hover-squares" style={{ marginLeft: '65px' }}>
                         <div>
-                            <h2 className="hover-squares-text" style={{ marginTop: '50px', marginBottom: '20px'}}>Hover squares</h2>
+                            <h2 className="hover-squares-text" style={{ marginTop: '50px', marginBottom: '20px' }}>Hover squares</h2>
                         </div>
                         <div className="hover-squares-details" style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-                            {blueSquares.map((squareIndex, index) => {
-                                const row = Math.floor(squareIndex / selectedDifficulty.field) + 1
-                                const col = (squareIndex % selectedDifficulty.field) + 1
-                                const uniqueHoverSquareKey = `hover-square-${row}-${col}-${index}`
+                            {blueSquares.sort((a, b) => a - b).map((squareIndex, index) => {
+                                const row = Math.floor(squareIndex / selectedDifficulty.field) + 1;
+                                const col = (squareIndex % selectedDifficulty.field) + 1;
+                                const uniqueHoverSquareKey = `hover-square-${row}-${col}-${index}`;
                                 return (
                                     <div
                                         key={uniqueHoverSquareKey}
